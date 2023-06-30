@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TodoListProject.Models;
 
@@ -10,16 +11,19 @@ namespace TodoListProject.Controllers
     {
         DbContextClasse dbContact = new DbContextClasse();
 
+      
         [HttpGet]
         public List<Todos> GetAll()
         {
             List<Todos> todos = this.dbContact.Todos.ToList();
             return todos;
         }
+
+       
         [HttpGet("{id}")]
         public IActionResult GetTodos(int id)
         {
-            Todos todo = dbContact.Todos.Find(id);
+            Todos todo = this.dbContact.Todos.Find(id);
             if (todo == null)
             {
                 return NotFound($"todo {id} not found");
@@ -30,13 +34,15 @@ namespace TodoListProject.Controllers
             }
         }
 
-
+      
         [HttpPost]
         public IActionResult Post(Todos todos)
         {
             try
             {
                 todos.IsCompleted = false;
+              /*  string userid= User.Identity.Name;
+                todos.UserId = userid!=null ? userid : 0;*/
                 dbContact.Add(todos);
                 dbContact.SaveChanges();
                 return Ok("Todos Created");
@@ -44,10 +50,10 @@ namespace TodoListProject.Controllers
             catch(Exception e)
             {
                 return BadRequest(e.Message);
-            }
-          
+            }  
         }
 
+       
         [HttpPut("{id}")]
         public IActionResult Put(int id,Todos todos) {
             var todosUpdates = dbContact.Todos.Find(id);
@@ -65,6 +71,7 @@ namespace TodoListProject.Controllers
             }
         }
 
+       
         [HttpDelete("{id}")]
         public IActionResult DeleteTodos(int id)
         {
@@ -81,6 +88,7 @@ namespace TodoListProject.Controllers
             }
         }
 
+    
         [HttpGet("countTodos")]
         public IActionResult CountTodos()
         {

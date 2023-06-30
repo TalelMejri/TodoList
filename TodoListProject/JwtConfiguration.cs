@@ -59,7 +59,7 @@ namespace TodoListProject
                     Subject = new ClaimsIdentity(new Claim[] {
                          new Claim(ClaimTypes.Name, email)
                  }),
-                    Expires = DateTime.UtcNow.AddHours(1),
+                    Expires = DateTime.UtcNow.AddDays(1),
                     SigningCredentials = new SigningCredentials(
                         tokenKey,
                         SecurityAlgorithms.HmacSha256)

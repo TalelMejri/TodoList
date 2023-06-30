@@ -17,10 +17,9 @@ namespace TodoListProject.Controllers
         public AuthController(JwtConfiguration jwtConfiguration)
         {
             this.jwtConfiguration = jwtConfiguration;
-            
         }
 
-
+     
         [HttpPost("signUp")]
         public IActionResult SignUp([FromBody] Users user)
         {
@@ -40,11 +39,9 @@ namespace TodoListProject.Controllers
 
 
         [AllowAnonymous]
-        [Authorize]
         [HttpPost("authUser")]
         public IActionResult Login([FromBody]User user)
         {
-            
             var token=jwtConfiguration.authenticate(user.email, user.password);
             if (token == null)
             {
