@@ -24,5 +24,11 @@ namespace TodoListProject.Models
 
         public bool IsCompleted { get; set; }
 
+        [ForeignKey("Users")]
+        [Required]
+        public int UserId { get; set; }
+
+        public virtual Users? User{ get; set; }
+
     }
 }
