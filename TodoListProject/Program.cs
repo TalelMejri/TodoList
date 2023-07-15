@@ -35,8 +35,18 @@ builder.Services.AddAuthentication(x =>
 
 builder.Services.AddSingleton<JwtConfiguration>(new JwtConfiguration(key));
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("MyCorsPolicy", builder =>
+    {
+        builder.WithOrigins("http://localhost:4200")  // Update with your Angular application's origin
+               .AllowAnyHeader()
+               .AllowAnyMethod();
+    });
+});
 
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -46,6 +56,9 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+
+
+app.UseCors("MyCorsPolicy");
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseAuthentication();
