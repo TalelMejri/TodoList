@@ -5,13 +5,15 @@ using TodoListProject.Models;
 
 namespace TodoListProject.Controllers
 {
+   
     [Route("api/[controller]")]
     [ApiController]
     public class AppController : ControllerBase
     {
         DbContextClasse dbContact = new DbContextClasse();
+       
+  
 
-      
         [HttpGet]
         public List<Todos> GetAll()
         {
@@ -95,5 +97,22 @@ namespace TodoListProject.Controllers
             List<Todos> count = dbContact.Todos.ToList();
             return Ok(count.Count());
         }
+
+        [HttpPut("changerStat")]
+        public IActionResult ChangerSatat(int id)
+        {
+            var todosUpdates = dbContact.Todos.Find(id);
+            if (todosUpdates == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                todosUpdates.IsCompleted = !todosUpdates.IsCompleted;
+                dbContact.SaveChanges();
+                return Ok(new { message = "Todos Updated" });
+            }
+        }
+
     }
 }
