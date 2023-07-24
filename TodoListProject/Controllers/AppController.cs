@@ -1,7 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using TodoListProject.Models;
+using System.Linq;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace TodoListProject.Controllers
 {
@@ -11,14 +18,63 @@ namespace TodoListProject.Controllers
     public class AppController : ControllerBase
     {
         DbContextClasse dbContact = new DbContextClasse();
-       
-  
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        private readonly RequestDelegate _next;
+
+      
+        public AppController(IHttpContextAccessor httpContextAccessor, RequestDelegate next)
+        {
+            _next = next;
+            _httpContextAccessor = httpContextAccessor;
+        }
+       /* private void AttachUserToContext(HttpContext context, string token)
+        {
+            try
+            {
+                var jwtSettings = context.RequestServices.GetRequiredService<IOptions<JwtSettings>>();
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var key = Encoding.ASCII.GetBytes(jwtSettings.Value.SecretKey);
+
+                tokenHandler.ValidateToken(token, new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = jwtSettings.Value.Issuer,
+                    ValidAudience = jwtSettings.Value.Audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(key)
+                }, out SecurityToken validatedToken);
+
+                var jwtToken = (JwtSecurityToken)validatedToken;
+                var userId = jwtToken.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
+
+                // Set the user ID in the HttpContext for future access in controllers or services
+                context.Items["UserId"] = userId;
+            }
+            catch
+            {
+                // Handle any exception if token validation fails
+            }
+        }*/
 
         [HttpGet]
-        public List<Todos> GetAll()
+        public string GetAll(HttpContext context)
         {
-            List<Todos> todos = this.dbContact.Todos.ToList();
-            return todos;
+            //var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            //var todosForUser = this.dbContact.Todos.Where(t => t.UserId == userId).ToList();
+          
+            var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+
+            /*  if (token != null)
+              {
+                  AttachUserToContext(context, token);
+              }
+            */
+            return "gg";
+            //return userId;
+           /* List<Todos> todos = this.dbContact.Todos.ToList();
+            return todos;*/
         }
 
        
@@ -43,6 +99,7 @@ namespace TodoListProject.Controllers
             try
             {
                 todos.IsCompleted = false;
+                todos.UserId = 6;
               /*  string userid= User.Identity.Name;
                 todos.UserId = userid!=null ? userid : 0;*/
                 dbContact.Add(todos);
@@ -82,7 +139,7 @@ namespace TodoListProject.Controllers
             {
                 dbContact.Remove(todo);
                 dbContact.SaveChanges();
-                return Ok("Deleted with success");
+                return Ok(new { message="Deleted with success"});
             }
             else
             {

@@ -26,14 +26,14 @@ namespace TodoListProject.Controllers
             Users test=jwtConfiguration.VerifyEmail(user.Email);
             if (test != null)
             {
-                return BadRequest("Email already exist");
+                return BadRequest(new {message="Email already exist"});
             }
             else
             {
                 user.Password=passwordHashing.HashPassword(user.Password);
                 dbContact.Users.Add(user);
                 dbContact.SaveChanges();
-                return Ok("User Created");
+                return Ok(new {message="User Created"});
             }
         }
 

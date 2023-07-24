@@ -35,6 +35,9 @@ builder.Services.AddAuthentication(x =>
 
 builder.Services.AddSingleton<JwtConfiguration>(new JwtConfiguration(key));
 
+builder.Services.AddHttpContextAccessor();
+
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("MyCorsPolicy", builder =>
